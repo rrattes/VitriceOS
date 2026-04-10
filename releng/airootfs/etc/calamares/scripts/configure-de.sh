@@ -6,6 +6,8 @@ set -euo pipefail
 
 GNOME_INSTALLED=false
 KDE_INSTALLED=false
+GNOME_GTK_THEME="Fluent-Dark"
+GNOME_CURSOR_THEME="Adwaita"
 
 pacman -Q gnome-shell    &>/dev/null 2>&1 && GNOME_INSTALLED=true
 pacman -Q plasma-desktop &>/dev/null 2>&1 && KDE_INSTALLED=true
@@ -14,22 +16,11 @@ echo "ClariceOS: GNOME=$GNOME_INSTALLED  KDE=$KDE_INSTALLED"
 
 # ── Display manager setup ─────────────────────────────────────────────────────
 if $KDE_INSTALLED; then
-    echo ">>> Configuring KDE Plasma + SDDM"
+    echo ">>> Configuring KDE Plasma + Plasma Login Manager"
 
-    systemctl enable  sddm.service 2>/dev/null || true
-    systemctl disable gdm.service  2>/dev/null || true
-
-    mkdir -p /etc/sddm.conf.d
-    cat > /etc/sddm.conf.d/clariceos.conf << 'EOF'
-[Autologin]
-Relogin=false
-Session=
-User=
-
-[General]
-HaltCommand=/usr/bin/systemctl poweroff
-RebootCommand=/usr/bin/systemctl reboot
-EOF
+    systemctl enable  plasmalogin.service 2>/dev/null || true
+    systemctl disable gdm.service          2>/dev/null || true
+    systemctl disable sddm.service         2>/dev/null || true
 
     # Remove GNOME if present (user chose KDE exclusively)
     if $GNOME_INSTALLED; then
@@ -43,7 +34,8 @@ elif $GNOME_INSTALLED; then
     echo ">>> Configuring GNOME + GDM"
 
     systemctl enable  gdm.service  2>/dev/null || true
-    systemctl disable sddm.service 2>/dev/null || true
+    systemctl disable plasmalogin.service 2>/dev/null || true
+    systemctl disable sddm.service        2>/dev/null || true
 
     # Switch GDM autologin from the live 'live' user to the installed user.
     # The live ISO ships AutomaticLogin=live; we replace it with the real user.
@@ -63,6 +55,32 @@ else
     echo "WARNING: No desktop environment detected. Skipping DM configuration."
 fi
 
+# ── GNOME Theme: Fluent-gtk-theme ─────────────────────────────────────────────
+if $GNOME_INSTALLED; then
+    echo ">>> Installing Fluent GTK theme..."
+    FLUENT_URL="https://github.com/vinceliuice/Fluent-gtk-theme/archive/refs/heads/master.tar.gz"
+    if curl -fsSL -o /tmp/fluent-gtk-theme.tar.gz "${FLUENT_URL}" 2>/dev/null; then
+        mkdir -p /tmp/fluent-gtk-src
+        tar -xzf /tmp/fluent-gtk-theme.tar.gz -C /tmp/fluent-gtk-src --strip-components=1
+        if [ -x /tmp/fluent-gtk-src/install.sh ]; then
+            bash /tmp/fluent-gtk-src/install.sh -d /usr/share/themes 2>/dev/null || true
+            echo "    Fluent GTK theme installed."
+        else
+            echo "    WARNING: Fluent installer not found in archive."
+        fi
+        rm -rf /tmp/fluent-gtk-src /tmp/fluent-gtk-theme.tar.gz
+    else
+        echo "    WARNING: Could not download Fluent GTK theme (no internet?)."
+    fi
+
+    # Libadwaita consistency check: GTK4 assets must be present for the chosen theme.
+    if [ -d "/usr/share/themes/${GNOME_GTK_THEME}/gtk-4.0" ]; then
+        echo "    Libadwaita/GTK4 visual consistency check passed (${GNOME_GTK_THEME})."
+    else
+        echo "    WARNING: Theme '${GNOME_GTK_THEME}' missing gtk-4.0 assets; libadwaita apps may use defaults."
+    fi
+fi
+
 # ── Compile dconf database (includes font + terminal overrides) ───────────────
 # Ensure the dconf override file has JetBrains Mono and kitty terminal settings.
 mkdir -p /etc/dconf/db/local.d /etc/dconf/profile
@@ -71,23 +89,23 @@ user-db:user
 system-db:local
 PROFILE
 
-cat > /etc/dconf/db/local.d/00-clariceos-theme << 'DCONF'
+cat > /etc/dconf/db/local.d/00-clariceos-theme << DCONF
 [org/gnome/desktop/interface]
-gtk-theme='Dracula'
+gtk-theme='${GNOME_GTK_THEME}'
 icon-theme='Tela-dark'
-cursor-theme='Dracula-cursors'
+cursor-theme='${GNOME_CURSOR_THEME}'
 color-scheme='prefer-dark'
 font-name='JetBrains Mono 11'
 monospace-font-name='JetBrains Mono 11'
 document-font-name='JetBrains Mono 11'
 
 [org/gnome/desktop/wm/preferences]
-theme='Dracula'
+theme='${GNOME_GTK_THEME}'
 button-layout=':minimize,maximize,close'
 titlebar-font='JetBrains Mono Bold 11'
 
 [org/gnome/shell/extensions/user-theme]
-name='Dracula'
+name='${GNOME_GTK_THEME}'
 
 [org/gnome/desktop/default-applications/terminal]
 exec='kitty'
@@ -115,7 +133,26 @@ else
     echo "    WARNING: Could not download Tela icon theme (no internet?). Skipping."
 fi
 
-# ── Apply Dracula theme to each new user ──────────────────────────────────────
+# ── KDE Theme: Layan-kde ──────────────────────────────────────────────────────
+if $KDE_INSTALLED; then
+    echo ">>> Installing Layan-kde theme..."
+    LAYAN_KDE_URL="https://github.com/vinceliuice/Layan-kde/archive/refs/heads/main.tar.gz"
+    if curl -fsSL -o /tmp/layan-kde.tar.gz "${LAYAN_KDE_URL}" 2>/dev/null; then
+        mkdir -p /tmp/layan-kde-src
+        tar -xzf /tmp/layan-kde.tar.gz -C /tmp/layan-kde-src --strip-components=1
+        if [ -x /tmp/layan-kde-src/install.sh ]; then
+            bash /tmp/layan-kde-src/install.sh 2>/dev/null || true
+            echo "    Layan-kde installed."
+        else
+            echo "    WARNING: Layan-kde installer not found in archive."
+        fi
+        rm -rf /tmp/layan-kde-src /tmp/layan-kde.tar.gz
+    else
+        echo "    WARNING: Could not download Layan-kde (no internet?). Skipping."
+    fi
+fi
+
+# ── Apply desktop theme defaults to each new user ─────────────────────────────
 # /etc/skel dotfiles were already copied by the Calamares users module.
 # This block applies gsettings overrides for GNOME users so the theme
 # is active on first login without requiring a dconf write by the user.
@@ -151,11 +188,12 @@ for home_dir in /home/*/; do
     [ -f "${home_dir}.config/starship.toml" ] || \
         cp /etc/skel/.config/starship.toml "${home_dir}.config/starship.toml" 2>/dev/null || true
 
-    # KDE dotfiles (kdeglobals, plasmarc, kwinrc)
+    # KDE profile: force-apply curated defaults so first boot is already customized.
     if $KDE_INSTALLED; then
-        for conf in kdeglobals plasmarc kwinrc breezerc; do
-            [ -f "${home_dir}.config/${conf}" ] || \
-                cp "/etc/skel/.config/${conf}" "${home_dir}.config/" 2>/dev/null || true
+        for conf in kdeglobals plasmarc kwinrc; do
+            [ -f "/etc/skel/.config/${conf}" ] \
+                && cp -f "/etc/skel/.config/${conf}" "${home_dir}.config/${conf}" 2>/dev/null \
+                || true
         done
     fi
 
@@ -170,7 +208,7 @@ for home_dir in /home/*/; do
 
     # Fix ownership
     chown -R "${username}:${username}" "${home_dir}.config/" "${home_dir}.zshrc" 2>/dev/null || true
-    echo ">>> Dracula theme + zsh applied for user: ${username}"
+    echo ">>> Theme profile + zsh applied for user: ${username}"
 done
 
 # ── Set zsh as default shell for root in installed system ─────────────────────
@@ -226,22 +264,30 @@ CHAOTIC_CONF
 
 setup_chaotic_aur || true
 
-# ── Install pamac from Chaotic-AUR (no build from source needed) ──────────────
-echo ">>> Installing pamac-aur..."
-if grep -q "chaotic-aur" /etc/pacman.conf 2>/dev/null; then
-    # Chaotic-AUR available — install directly via pacman
+# ── Install Pamac on installed system ──────────────────────────────────────────
+echo ">>> Installing Pamac..."
+
+# First try the official repository package name (if available).
+if pacman -S --noconfirm --needed pamac 2>/dev/null; then
+    echo "    Pamac installed from official repositories."
+
+# Otherwise, prefer Chaotic-AUR binary package (no source build).
+elif grep -q "chaotic-aur" /etc/pacman.conf 2>/dev/null; then
     pacman -S --noconfirm --needed pamac-aur 2>/dev/null \
-        && echo "    pamac-aur installed from Chaotic-AUR." \
-        || echo "    WARNING: pamac-aur not found in Chaotic-AUR."
+        && echo "    Pamac (pamac-aur) installed from Chaotic-AUR." \
+        || echo "    WARNING: Pamac package not found in Chaotic-AUR."
+
+# Last resort: build pamac-aur with yay.
 else
-    # Fallback: build from AUR via yay
     BUILD_USER_PAMAC=$(awk -F: '$3>=1000 && $3<65534 {print $1; exit}' /etc/passwd 2>/dev/null || true)
     if [ -n "${BUILD_USER_PAMAC}" ] && command -v yay &>/dev/null; then
         echo "${BUILD_USER_PAMAC} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-pamac-install
         sudo -u "${BUILD_USER_PAMAC}" yay -S --noconfirm --needed pamac-aur 2>/dev/null \
-            && echo "    pamac-aur installed via yay." \
-            || echo "    WARNING: pamac-aur installation failed."
+            && echo "    Pamac (pamac-aur) installed via yay." \
+            || echo "    WARNING: Pamac installation failed."
         rm -f /etc/sudoers.d/99-pamac-install
+    else
+        echo "    WARNING: Could not install Pamac (yay/user unavailable)."
     fi
 fi
 
@@ -326,7 +372,7 @@ install_gpu_drivers() {
 
 install_gpu_drivers || true
 
-# ── Plymouth Dracula theme — deploy to installed system ───────────────────────
+# ── Plymouth Clarice theme — deploy to installed system ───────────────────────
 echo ">>> Installing ClariceOS Plymouth theme..."
 if command -v plymouth &>/dev/null; then
     PLYDIR="/usr/share/plymouth/themes/clariceos"
@@ -336,7 +382,7 @@ if command -v plymouth &>/dev/null; then
     cat > "${PLYDIR}/clariceos.plymouth" << 'PLYDESC'
 [Plymouth Theme]
 Name=ClariceOS
-Description=ClariceOS — Dracula boot splash
+Description=ClariceOS — Clarice boot splash
 ModuleName=script
 
 [script]
@@ -346,7 +392,7 @@ PLYDESC
 
     # Plymouth script
     cat > "${PLYDIR}/clariceos.script" << 'PLYSCRIPT'
-// ClariceOS Plymouth Theme — Dracula colour palette
+// ClariceOS Plymouth Theme — Clarice colour palette
 width  = Window.GetWidth();
 height = Window.GetHeight();
 
