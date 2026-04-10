@@ -20,10 +20,17 @@ if $KDE_INSTALLED; then
     systemctl disable gdm.service  2>/dev/null || true
 
     mkdir -p /etc/sddm.conf.d
-    cat > /etc/sddm.conf.d/clariceos.conf << 'EOF'
+
+    # Prefer KDE Plasma Wayland session (KWin) when available.
+    KDE_SESSION=""
+    if [ -f /usr/share/wayland-sessions/plasma.desktop ]; then
+        KDE_SESSION="plasma.desktop"
+    fi
+
+    cat > /etc/sddm.conf.d/clariceos.conf << EOF
 [Autologin]
 Relogin=false
-Session=
+Session=${KDE_SESSION}
 User=
 
 [General]
