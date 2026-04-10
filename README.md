@@ -1,6 +1,6 @@
 # ClariceOS
 
-ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabilidade e estética coesa. Vem com instalador gráfico completo, tema **Dracula** aplicado em toda a stack visual (GTK, KDE, Plymouth, terminal, prompt e ícones), suporte a GNOME e KDE Plasma, bootloader Limine moderno e suporte nativo a btrfs com snapshots automáticos.
+ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabilidade e estética coesa. Vem com instalador gráfico completo, tema **Fluent** no GNOME e **Layan-kde** no KDE, além de identidade Dracula no terminal/boot splash, suporte a GNOME e KDE Plasma, bootloader Limine moderno e suporte nativo a btrfs com snapshots automáticos.
 
 ---
 
@@ -20,12 +20,12 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 | **Apps containerizados** | Flatpak + Flathub + Distrobox + Podman |
 | **Segurança** | AppArmor (MAC) + Secure Boot via sbctl |
 
-### Visual — Dracula em toda a stack
+### Visual — Fluent (GNOME) + Layan-kde (KDE)
 | Componente | Detalhe |
 |---|---|
-| **Tema GTK** | Dracula (GTK3 + GTK4) |
+| **Tema GTK (GNOME)** | Fluent-Dark (GTK3 + GTK4) |
 | **Tema de ícones** | Tela-dark |
-| **Tema de cursor** | Dracula-cursors |
+| **Tema de cursor** | Adwaita |
 | **Fonte do sistema** | JetBrains Mono 11 (UI, monospace, documentos) |
 | **Terminal** | Kitty — tema Dracula completo, tab bar powerline |
 | **Fonte do terminal** | JetBrainsMono Nerd Font 12pt |
@@ -33,7 +33,7 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 | **Prompt** | Starship — paleta Dracula (diretório cyan, branch pink, `❯` green) |
 | **Boot splash** | Plymouth tema `clariceos` (fundo `#282a36`, barra `#bd93f9`) |
 | **KDE** | Layan-kde via kdeglobals, plasmarc e kwinrc |
-| **GNOME** | Dracula via dconf system-wide database |
+| **GNOME** | Fluent-Dark via dconf system-wide database |
 
 ### Gaming (opcional)
 - Steam, Proton, MangoHUD, GameMode, Lutris, wine, winetricks
@@ -55,7 +55,7 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 Instalado por padrão sem necessidade de internet. Inclui:
 - GNOME Shell + GDM
 - Nautilus, GNOME Text Editor, EOG
-- Tema Dracula aplicado via dconf system-wide database
+- Tema Fluent-Dark aplicado via dconf system-wide database
 - Kitty como terminal padrão (`org.gnome.desktop.default-applications.terminal`)
 - JetBrains Mono 11 em `font-name`, `monospace-font-name`, `document-font-name` e `titlebar-font`
 - Ícones Tela-dark
@@ -179,7 +179,7 @@ releng/
 │   │   │   │   └── setup-secureboot.sh    # Configura Secure Boot via sbctl
 │   │   │   └── netinstall.yaml            # Grupos: GNOME, KDE, Gaming, NVIDIA, Dev
 │   │   ├── dconf/db/local.d/
-│   │   │   └── 00-clariceos-theme         # Defaults GNOME: Dracula, Tela-dark, Kitty, JetBrains Mono
+│   │   │   └── 00-clariceos-theme         # Defaults GNOME: Fluent-Dark, Tela-dark, Kitty, JetBrains Mono
 │   │   ├── plymouth/
 │   │   │   └── plymouthd.conf             # Theme=clariceos
 │   │   ├── skel/.config/

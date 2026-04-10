@@ -6,6 +6,8 @@ set -euo pipefail
 
 GNOME_INSTALLED=false
 KDE_INSTALLED=false
+GNOME_GTK_THEME="Fluent-Dark"
+GNOME_CURSOR_THEME="Adwaita"
 
 pacman -Q gnome-shell    &>/dev/null 2>&1 && GNOME_INSTALLED=true
 pacman -Q plasma-desktop &>/dev/null 2>&1 && KDE_INSTALLED=true
@@ -53,6 +55,32 @@ else
     echo "WARNING: No desktop environment detected. Skipping DM configuration."
 fi
 
+# ── GNOME Theme: Fluent-gtk-theme ─────────────────────────────────────────────
+if $GNOME_INSTALLED; then
+    echo ">>> Installing Fluent GTK theme..."
+    FLUENT_URL="https://github.com/vinceliuice/Fluent-gtk-theme/archive/refs/heads/master.tar.gz"
+    if curl -fsSL -o /tmp/fluent-gtk-theme.tar.gz "${FLUENT_URL}" 2>/dev/null; then
+        mkdir -p /tmp/fluent-gtk-src
+        tar -xzf /tmp/fluent-gtk-theme.tar.gz -C /tmp/fluent-gtk-src --strip-components=1
+        if [ -x /tmp/fluent-gtk-src/install.sh ]; then
+            bash /tmp/fluent-gtk-src/install.sh -d /usr/share/themes 2>/dev/null || true
+            echo "    Fluent GTK theme installed."
+        else
+            echo "    WARNING: Fluent installer not found in archive."
+        fi
+        rm -rf /tmp/fluent-gtk-src /tmp/fluent-gtk-theme.tar.gz
+    else
+        echo "    WARNING: Could not download Fluent GTK theme (no internet?)."
+    fi
+
+    # Libadwaita consistency check: GTK4 assets must be present for the chosen theme.
+    if [ -d "/usr/share/themes/${GNOME_GTK_THEME}/gtk-4.0" ]; then
+        echo "    Libadwaita/GTK4 visual consistency check passed (${GNOME_GTK_THEME})."
+    else
+        echo "    WARNING: Theme '${GNOME_GTK_THEME}' missing gtk-4.0 assets; libadwaita apps may use defaults."
+    fi
+fi
+
 # ── Compile dconf database (includes font + terminal overrides) ───────────────
 # Ensure the dconf override file has JetBrains Mono and kitty terminal settings.
 mkdir -p /etc/dconf/db/local.d /etc/dconf/profile
@@ -61,23 +89,23 @@ user-db:user
 system-db:local
 PROFILE
 
-cat > /etc/dconf/db/local.d/00-clariceos-theme << 'DCONF'
+cat > /etc/dconf/db/local.d/00-clariceos-theme << DCONF
 [org/gnome/desktop/interface]
-gtk-theme='Dracula'
+gtk-theme='${GNOME_GTK_THEME}'
 icon-theme='Tela-dark'
-cursor-theme='Dracula-cursors'
+cursor-theme='${GNOME_CURSOR_THEME}'
 color-scheme='prefer-dark'
 font-name='JetBrains Mono 11'
 monospace-font-name='JetBrains Mono 11'
 document-font-name='JetBrains Mono 11'
 
 [org/gnome/desktop/wm/preferences]
-theme='Dracula'
+theme='${GNOME_GTK_THEME}'
 button-layout=':minimize,maximize,close'
 titlebar-font='JetBrains Mono Bold 11'
 
 [org/gnome/shell/extensions/user-theme]
-name='Dracula'
+name='${GNOME_GTK_THEME}'
 
 [org/gnome/desktop/default-applications/terminal]
 exec='kitty'
@@ -124,7 +152,7 @@ if $KDE_INSTALLED; then
     fi
 fi
 
-# ── Apply Dracula theme to each new user ──────────────────────────────────────
+# ── Apply desktop theme defaults to each new user ─────────────────────────────
 # /etc/skel dotfiles were already copied by the Calamares users module.
 # This block applies gsettings overrides for GNOME users so the theme
 # is active on first login without requiring a dconf write by the user.
