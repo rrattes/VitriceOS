@@ -7,7 +7,7 @@
 # Select only ONE desktop environment.
 
 - name: "GNOME"
-  description: "GNOME Desktop — modern, clean, and user-friendly. Pre-installed, no download required."
+  description: "GNOME (Recomendado) — pronto para uso, funciona offline e não requer download adicional."
   hidden: false
   selected: true
   critical: false
@@ -21,7 +21,7 @@
     - eog
 
 - name: "KDE Plasma"
-  description: "KDE Plasma 6 (KWin/Wayland) — interface moderna, altamente personalizável e com foco em Wayland. Requer internet."
+  description: "KDE Plasma — altamente personalizável. Requer internet durante a instalação para baixar pacotes."
   hidden: false
   selected: false
   critical: false
@@ -45,7 +45,7 @@
     - breeze-gtk
 
 - name: "Gaming"
-  description: "Steam, Proton-GE, MangoHUD, GameMode e ferramentas para jogos. Requires internet connection."
+  description: "Perfil Gaming — Steam, Proton, MangoHUD e GameMode. Requer internet para instalação."
   hidden: false
   selected: false
   critical: false
@@ -70,7 +70,7 @@
     - lib32-vulkan-intel
 
 - name: "Drivers NVIDIA Proprietários"
-  description: "Driver nvidia-dkms para GPUs NVIDIA. Habilita aceleração completa e suporte a Wayland. Requires internet connection."
+  description: "Drivers NVIDIA proprietários (nvidia-dkms). Marque apenas se seu hardware for NVIDIA. Requer internet."
   hidden: false
   selected: false
   critical: false
@@ -81,7 +81,7 @@
     - lib32-nvidia-utils
 
 - name: "Desenvolvimento"
-  description: "Ferramentas de desenvolvimento: compiladores, Python, Docker, editores. Requires internet connection."
+  description: "Perfil Desenvolvimento — compiladores, Python, Docker e ferramentas de produtividade. Requer internet."
   hidden: false
   selected: false
   critical: false
