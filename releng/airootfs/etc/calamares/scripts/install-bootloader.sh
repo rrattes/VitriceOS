@@ -15,7 +15,24 @@ set -euo pipefail
 ROOT_UUID=$(findmnt -n -o UUID / 2>/dev/null)
 ROOT_DEVICE=$(findmnt -n -o SOURCE /)
 ROOT_FS=$(findmnt -n -o FSTYPE /)
-DISK=$(lsblk -no PKNAME "${ROOT_DEVICE}" 2>/dev/null | head -1)
+
+# Resolve the physical disk backing a mounted source. This handles mapper/LVM
+# devices by walking parent block devices until reaching the top-level disk.
+resolve_disk() {
+    local src="$1"
+    local parent=""
+
+    while true; do
+        parent=$(lsblk -no PKNAME "${src}" 2>/dev/null | head -1 || true)
+        [ -z "${parent}" ] && break
+        [ -b "/dev/${parent}" ] || break
+        src="/dev/${parent}"
+    done
+
+    basename "${src}"
+}
+
+DISK=$(resolve_disk "${ROOT_DEVICE}")
 
 if [ -z "${ROOT_UUID}" ]; then
     echo "ERROR: Could not determine root partition UUID. Aborting bootloader install."
@@ -116,17 +133,24 @@ CFG_ZEN
 detect_esp() {
     for mp in /boot/efi /boot /efi; do
         local t
+        local fs
         t=$(findmnt -n -o TARGET "${mp}" 2>/dev/null)
-        if [ -n "${t}" ] && mountpoint -q "${t}"; then
+        fs=$(findmnt -n -o FSTYPE "${mp}" 2>/dev/null || true)
+        if [ -n "${t}" ] && mountpoint -q "${t}" && \
+           echo "${fs}" | grep -qiE 'vfat|fat|msdos'; then
             echo "${t}"
             return 0
         fi
     done
-    echo "/boot/efi"   # fallback — should not normally be reached on UEFI
+    return 1
 }
 
 if ${UEFI}; then
-    ESP=$(detect_esp)
+    if ! ESP=$(detect_esp); then
+        echo "ERROR: UEFI mode detected but no mounted FAT ESP was found."
+        echo "       Expected one of: /boot/efi, /boot or /efi (FAT filesystem)."
+        exit 1
+    fi
     echo "    ESP detected at: ${ESP}"
     K_PREFIX="uuid://${ROOT_UUID}/boot"
     write_limine_cfg "${ESP}/limine.cfg"        "${K_PREFIX}" "${K_PREFIX}"
