@@ -18,6 +18,9 @@ echo "ClariceOS: GNOME=$GNOME_INSTALLED  KDE=$KDE_INSTALLED"
 # Load optional post-install modules (PR1: theme modularization).
 [ -f "${POSTINSTALL_DIR}/20-theme-gnome.sh" ] && source "${POSTINSTALL_DIR}/20-theme-gnome.sh"
 [ -f "${POSTINSTALL_DIR}/21-theme-kde.sh" ] && source "${POSTINSTALL_DIR}/21-theme-kde.sh"
+[ -f "${POSTINSTALL_DIR}/40-repositories.sh" ] && source "${POSTINSTALL_DIR}/40-repositories.sh"
+[ -f "${POSTINSTALL_DIR}/41-pamac.sh" ] && source "${POSTINSTALL_DIR}/41-pamac.sh"
+[ -f "${POSTINSTALL_DIR}/50-flatpak.sh" ] && source "${POSTINSTALL_DIR}/50-flatpak.sh"
 
 # ── Display manager setup ─────────────────────────────────────────────────────
 if $KDE_INSTALLED; then
@@ -157,83 +160,15 @@ if command -v zsh &>/dev/null; then
         cp /etc/skel/.config/starship.toml /root/.config/starship.toml 2>/dev/null || true
 fi
 
-# ── Chaotic-AUR setup (installed system) ─────────────────────────────────────
-# Chaotic-AUR provides pre-compiled AUR packages, eliminating the need to
-# build pamac-aur, limine-snapper-sync, openrgb, etc. from source.
-echo ">>> Configuring Chaotic-AUR on installed system..."
-
-setup_chaotic_aur() {
-    # Install keyring
-    if curl -fsSL "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-keyring.pkg.tar.zst" \
-            -o /tmp/chaotic-keyring.pkg.tar.zst 2>/dev/null; then
-        pacman-key --recv-key 3056513887B78AEB \
-            --keyserver keyserver.ubuntu.com 2>/dev/null || true
-        pacman-key --lsign-key 3056513887B78AEB 2>/dev/null || true
-        pacman -U --noconfirm /tmp/chaotic-keyring.pkg.tar.zst 2>/dev/null || true
-        rm -f /tmp/chaotic-keyring.pkg.tar.zst
-    else
-        echo "    WARNING: Chaotic-AUR keyring unavailable (no internet?). Skipping."
-        return 1
-    fi
-
-    # Install mirrorlist
-    curl -fsSL "https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorlist.pkg.tar.zst" \
-        -o /tmp/chaotic-mirrorlist.pkg.tar.zst 2>/dev/null \
-        && pacman -U --noconfirm /tmp/chaotic-mirrorlist.pkg.tar.zst 2>/dev/null || true
-    rm -f /tmp/chaotic-mirrorlist.pkg.tar.zst
-
-    # Add repo to pacman.conf if not already present
-    if ! grep -q "chaotic-aur" /etc/pacman.conf; then
-        cat >> /etc/pacman.conf << 'CHAOTIC_CONF'
-
-# Chaotic-AUR — pre-compiled AUR packages
-[chaotic-aur]
-Include = /etc/pacman.d/chaotic-mirrorlist
-CHAOTIC_CONF
-    fi
-
-    pacman -Sy --noconfirm 2>/dev/null || true
-    echo "    Chaotic-AUR configured."
-}
-
-setup_chaotic_aur || true
-
-# ── Install Pamac on installed system ──────────────────────────────────────────
-echo ">>> Installing Pamac..."
-
-# First try the official repository package name (if available).
-if pacman -S --noconfirm --needed pamac 2>/dev/null; then
-    echo "    Pamac installed from official repositories."
-
-# Otherwise, prefer Chaotic-AUR binary package (no source build).
-elif grep -q "chaotic-aur" /etc/pacman.conf 2>/dev/null; then
-    pacman -S --noconfirm --needed pamac-aur 2>/dev/null \
-        && echo "    Pamac (pamac-aur) installed from Chaotic-AUR." \
-        || echo "    WARNING: Pamac package not found in Chaotic-AUR."
-
-# Last resort: build pamac-aur with yay.
-else
-    BUILD_USER_PAMAC=$(awk -F: '$3>=1000 && $3<65534 {print $1; exit}' /etc/passwd 2>/dev/null || true)
-    if [ -n "${BUILD_USER_PAMAC}" ] && command -v yay &>/dev/null; then
-        echo "${BUILD_USER_PAMAC} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99-pamac-install
-        sudo -u "${BUILD_USER_PAMAC}" yay -S --noconfirm --needed pamac-aur 2>/dev/null \
-            && echo "    Pamac (pamac-aur) installed via yay." \
-            || echo "    WARNING: Pamac installation failed."
-        rm -f /etc/sudoers.d/99-pamac-install
-    else
-        echo "    WARNING: Could not install Pamac (yay/user unavailable)."
-    fi
+# ── Repository and package modules (PR2) ──────────────────────────────────────
+if command -v setup_chaotic_aur >/dev/null 2>&1; then
+    setup_chaotic_aur || true
 fi
-
-# ── Flatpak + Flathub ─────────────────────────────────────────────────────────
-echo ">>> Configuring Flatpak + Flathub..."
-if command -v flatpak &>/dev/null; then
-    flatpak remote-add --if-not-exists flathub \
-        https://dl.flathub.org/repo/flathub.flatpakrepo 2>/dev/null \
-        && echo "    Flathub remote added." \
-        || echo "    WARNING: Flathub remote add failed (no internet?)."
-else
-    echo "    WARNING: flatpak not found — skipping."
+if command -v install_pamac >/dev/null 2>&1; then
+    install_pamac
+fi
+if command -v setup_flatpak_flathub >/dev/null 2>&1; then
+    setup_flatpak_flathub
 fi
 
 # ── AppArmor ──────────────────────────────────────────────────────────────────
