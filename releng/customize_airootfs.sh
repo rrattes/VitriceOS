@@ -519,6 +519,27 @@ if ! id -u live &>/dev/null; then
     useradd -m -G wheel,audio,video,storage,optical,network,scanner,uucp live
 fi
 passwd -d live
+# Ensure account is unlocked for display-manager autologin.
+passwd -u live 2>/dev/null || true
+
+# GDM autologin can rely on this group on some setups.
+groupadd -f autologin
+usermod -aG autologin live 2>/dev/null || true
+
+# Re-assert live GDM autologin values to avoid package/default overrides.
+if [ -f /etc/gdm/custom.conf ]; then
+    sed -i 's/^AutomaticLoginEnable=.*/AutomaticLoginEnable=True/' /etc/gdm/custom.conf
+    if grep -q '^AutomaticLogin=' /etc/gdm/custom.conf; then
+        sed -i 's/^AutomaticLogin=.*/AutomaticLogin=live/' /etc/gdm/custom.conf
+    else
+        printf '%s\n' 'AutomaticLogin=live' >> /etc/gdm/custom.conf
+    fi
+    if grep -q '^InitialSetupEnable=' /etc/gdm/custom.conf; then
+        sed -i 's/^InitialSetupEnable=.*/InitialSetupEnable=False/' /etc/gdm/custom.conf
+    else
+        printf '%s\n' 'InitialSetupEnable=False' >> /etc/gdm/custom.conf
+    fi
+fi
 
 # Copy skel configs to live home
 cp -rT /etc/skel/ /home/live/
@@ -542,6 +563,7 @@ chmod 440 /etc/sudoers.d/live
 
 # Set zsh as shell for live user
 if command -v zsh &>/dev/null; then
+    grep -qxF "$(command -v zsh)" /etc/shells || echo "$(command -v zsh)" >> /etc/shells
     chsh -s "$(command -v zsh)" live && echo "    live shell set to zsh." || true
 fi
 
