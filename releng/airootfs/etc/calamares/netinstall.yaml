@@ -29,8 +29,7 @@
     - plasma-meta
     - plasma-nm
     - plasma-pa
-    - sddm
-    - sddm-kcm
+    - plasma-login-manager
     - dolphin
     - konsole
     - kate
