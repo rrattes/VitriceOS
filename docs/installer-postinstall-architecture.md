@@ -161,3 +161,63 @@ Cada módulo deve:
 - Mapeamento claro de responsabilidades por script;
 - Riscos e mitigação documentados;
 - Matriz mínima de validação definida.
+
+---
+
+## 9) Fluxo de melhorias no Calamares (proposta prática)
+
+Este é o fluxo sugerido para implementar as melhorias sem quebrar o instalador:
+
+## 9.1 Fluxo da interface (wizard)
+
+1. **Welcome**
+   - Exibir checks de pré-requisito (UEFI/BIOS, RAM, rede).
+2. **Locale/Keyboard**
+   - Manter como está.
+3. **Partition**
+   - Manter, mas com dicas contextuais para btrfs/ext4.
+4. **Users**
+   - Incluir aviso de autologin pós-instalação quando aplicável.
+5. **Perfis (novo)**
+   - Substituir seleção “solta” por perfis: Base, Dev, Gaming, Creator.
+6. **Desktop Choice**
+   - Escolha exclusiva GNOME ou KDE com resumo visual do tema aplicado.
+7. **Resumo**
+   - Mostrar claramente: bootloader, FS, DE, perfil, repositórios extras.
+
+## 9.2 Fluxo de execução (backend)
+
+```text
+partition -> mount -> unpackfs
+-> machineid/fstab/locale/keyboard
+-> netinstall (perfil + DE)
+-> shellprocess@bootloader (chroot)
+-> users
+-> shellprocess (orquestrador pós-install)
+   -> 10-display-manager
+   -> 20-theme-gnome | 21-theme-kde
+   -> 30-shell
+   -> 40-repos
+   -> 41-pamac
+   -> 50-flatpak
+   -> 60-drivers
+   -> 70-security
+-> shellprocess@secureboot
+-> shellprocess@limine-deploy (outside chroot)
+-> umount
+```
+
+## 9.3 Estratégia de rollout (PRs pequenos)
+
+- **PR 1**: módulos de tema (sem alterar pacotes).
+- **PR 2**: perfis de netinstall.
+- **PR 3**: modularização do `configure-de.sh` (orquestrador + includes).
+- **PR 4**: observabilidade (log único + status por etapa).
+- **PR 5**: QA matrix automatizada (smoke em VM).
+
+## 9.4 Critérios de aceite por fase
+
+- **Fase UI**: usuário entende em 1 tela o que será instalado.
+- **Fase Backend**: reexecução não quebra estado (idempotência).
+- **Fase Boot**: BIOS/UEFI com boot confirmado.
+- **Fase DE**: GNOME/KDE sobem já com tema correto no primeiro login.
