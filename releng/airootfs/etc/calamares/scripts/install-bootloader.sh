@@ -22,6 +22,7 @@ resolve_disk() {
     local src="$1"
     local parent=""
 
+
     while true; do
         parent=$(lsblk -no PKNAME "${src}" 2>/dev/null | head -1 || true)
         [ -z "${parent}" ] && break
@@ -32,7 +33,6 @@ resolve_disk() {
     basename "${src}"
 }
 
-DISK=$(resolve_disk "${ROOT_DEVICE}")
 
 if [ -z "${ROOT_UUID}" ]; then
     echo "ERROR: Could not determine root partition UUID. Aborting bootloader install."
@@ -165,7 +165,8 @@ fi
 # ── Install Limine ────────────────────────────────────────────────────────────
 
 if ${UEFI}; then
-    ESP=$(detect_esp)
+    # Reuse the validated ESP found above instead of resolving again.
+    : "${ESP:?missing ESP mount point}"
 
     mkdir -p "${ESP}/EFI/limine" "${ESP}/EFI/BOOT"
 
@@ -177,18 +178,24 @@ if ${UEFI}; then
     echo "    Limine EFI binaries copied."
 
     # Register a firmware boot entry via efibootmgr
-    if command -v efibootmgr &>/dev/null && [ -n "${DISK}" ]; then
-        # Use the actual ESP device found by detect_esp() — not the hardcoded /boot/efi.
-        EFI_PART_NUM=$(lsblk -no PARTN "$(findmnt -n -o SOURCE "${ESP}")" 2>/dev/null | head -1 || echo "1")
+    if command -v efibootmgr &>/dev/null; then
+        # Register entry against the disk that actually backs the ESP.
+        EFI_DEVICE=$(findmnt -n -o SOURCE "${ESP}" 2>/dev/null || true)
+        EFI_DISK=$(resolve_disk "${EFI_DEVICE}" || true)
+        EFI_PART_NUM=$(lsblk -no PARTN "${EFI_DEVICE}" 2>/dev/null | head -1 || echo "1")
         [ -z "${EFI_PART_NUM}" ] && EFI_PART_NUM="1"
-        efibootmgr --create \
-            --disk "/dev/${DISK}" \
-            --part "${EFI_PART_NUM}" \
-            --label "ClariceOS (Limine)" \
-            --loader "/EFI/limine/BOOTX64.EFI" \
-            2>/dev/null \
-            && echo "    UEFI boot entry created." \
-            || echo "    WARNING: efibootmgr failed — EFI/BOOT fallback will be used."
+        if [ -n "${EFI_DISK}" ] && [ -b "/dev/${EFI_DISK}" ]; then
+            efibootmgr --create \
+                --disk "/dev/${EFI_DISK}" \
+                --part "${EFI_PART_NUM}" \
+                --label "ClariceOS (Limine)" \
+                --loader "/EFI/limine/BOOTX64.EFI" \
+                2>/dev/null \
+                && echo "    UEFI boot entry created." \
+                || echo "    WARNING: efibootmgr failed — EFI/BOOT fallback will be used."
+        else
+            echo "    WARNING: could not resolve ESP disk for efibootmgr; EFI/BOOT fallback will be used."
+        fi
     fi
 else
     # BIOS: write Limine to the MBR of the target disk
