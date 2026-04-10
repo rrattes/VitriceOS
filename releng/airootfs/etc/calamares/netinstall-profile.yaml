@@ -9,7 +9,8 @@
   hidden: false
   selected: true
   critical: false
-  packages: []
+  packages:
+    - xdg-utils
 
 - name: "Gaming"
   description: "Perfil Gamer — Steam, Proton, MangoHUD e GameMode. Requer internet para instalação."
