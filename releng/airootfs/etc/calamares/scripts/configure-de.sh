@@ -105,6 +105,25 @@ else
     echo "    WARNING: Could not download Tela icon theme (no internet?). Skipping."
 fi
 
+# ── KDE Theme: Layan-kde ──────────────────────────────────────────────────────
+if $KDE_INSTALLED; then
+    echo ">>> Installing Layan-kde theme..."
+    LAYAN_KDE_URL="https://github.com/vinceliuice/Layan-kde/archive/refs/heads/main.tar.gz"
+    if curl -fsSL -o /tmp/layan-kde.tar.gz "${LAYAN_KDE_URL}" 2>/dev/null; then
+        mkdir -p /tmp/layan-kde-src
+        tar -xzf /tmp/layan-kde.tar.gz -C /tmp/layan-kde-src --strip-components=1
+        if [ -x /tmp/layan-kde-src/install.sh ]; then
+            bash /tmp/layan-kde-src/install.sh 2>/dev/null || true
+            echo "    Layan-kde installed."
+        else
+            echo "    WARNING: Layan-kde installer not found in archive."
+        fi
+        rm -rf /tmp/layan-kde-src /tmp/layan-kde.tar.gz
+    else
+        echo "    WARNING: Could not download Layan-kde (no internet?). Skipping."
+    fi
+fi
+
 # ── Apply Dracula theme to each new user ──────────────────────────────────────
 # /etc/skel dotfiles were already copied by the Calamares users module.
 # This block applies gsettings overrides for GNOME users so the theme
@@ -161,7 +180,7 @@ for home_dir in /home/*/; do
 
     # Fix ownership
     chown -R "${username}:${username}" "${home_dir}.config/" "${home_dir}.zshrc" 2>/dev/null || true
-    echo ">>> Dracula theme + zsh applied for user: ${username}"
+    echo ">>> Theme profile + zsh applied for user: ${username}"
 done
 
 # ── Set zsh as default shell for root in installed system ─────────────────────

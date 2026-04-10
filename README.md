@@ -32,7 +32,7 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 | **Shell** | ZSH + autosuggestions + syntax-highlighting + history-substring-search |
 | **Prompt** | Starship — paleta Dracula (diretório cyan, branch pink, `❯` green) |
 | **Boot splash** | Plymouth tema `clariceos` (fundo `#282a36`, barra `#bd93f9`) |
-| **KDE** | Dracula via kdeglobals, plasmarc, kwinrc, breezerc |
+| **KDE** | Layan-kde via kdeglobals, plasmarc e kwinrc |
 | **GNOME** | Dracula via dconf system-wide database |
 
 ### Gaming (opcional)
@@ -65,7 +65,7 @@ Selecionável na tela de netinstall. Inclui:
 - Plasma Desktop + Plasma Login Manager
 - Dolphin, Kate, KCalc
 - Kitty como terminal padrão (`TerminalApplication=kitty`)
-- Dracula via kdeglobals com JetBrains Mono em todas as fontes
+- Layan-kde aplicado via kdeglobals/plasmarc/kwinrc com JetBrains Mono
 - Ícones Tela-dark
 
 ---
@@ -148,11 +148,12 @@ O instalador gráfico Calamares guia o usuário pelos seguintes passos:
 O script executa dentro do chroot do sistema instalado e realiza:
 - Configuração do display manager (GDM ou Plasma Login Manager)
 - Instalação e registro do tema Tela-dark e Plymouth `clariceos`
+- Instalação do tema KDE **Layan-kde** quando a opção KDE é escolhida
 - Detecção de GPU e instalação de drivers (NVIDIA dkms, AMD Vulkan, Intel media)
 - Configuração do Chaotic-AUR e instalação automática do Pamac (`pamac`/`pamac-aur`, com fallback)
 - Adição do Flathub ao Flatpak
 - `chsh -s zsh` para todos os usuários e root
-- Aplicação de dotfiles (kitty, starship, zsh, GTK, KDE) para cada usuário, com perfil KDE forçado para primeiro boot já customizado
+- Aplicação de dotfiles (kitty, starship, zsh, GTK, KDE) para cada usuário, com perfil KDE (Layan-kde) forçado para primeiro boot já customizado
 - Rebuild do initramfs com hook Plymouth
 
 ---
