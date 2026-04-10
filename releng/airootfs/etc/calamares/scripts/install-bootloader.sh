@@ -22,8 +22,6 @@ resolve_disk() {
     local src="$1"
     local parent=""
 
-    [ -z "${src}" ] && return 1
-    src=$(realpath "${src}" 2>/dev/null || echo "${src}")
 
     while true; do
         parent=$(lsblk -no PKNAME "${src}" 2>/dev/null | head -1 || true)
@@ -35,15 +33,6 @@ resolve_disk() {
     basename "${src}"
 }
 
-DISK=$(resolve_disk "${ROOT_DEVICE}" || true)
-
-# Fallback: if root device cannot be mapped to a concrete block disk,
-# attempt to resolve the disk backing /boot (useful with complex root stacks).
-if [ -z "${DISK}" ] || [ ! -b "/dev/${DISK}" ]; then
-    BOOT_DEVICE=$(findmnt -n -o SOURCE /boot 2>/dev/null || true)
-    DISK=$(resolve_disk "${BOOT_DEVICE}" || true)
-fi
-[ -b "/dev/${DISK}" ] || DISK=""
 
 if [ -z "${ROOT_UUID}" ]; then
     echo "ERROR: Could not determine root partition UUID. Aborting bootloader install."
