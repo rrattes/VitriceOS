@@ -8,11 +8,16 @@ GNOME_INSTALLED=false
 KDE_INSTALLED=false
 GNOME_GTK_THEME="Fluent-Dark"
 GNOME_CURSOR_THEME="Adwaita"
+POSTINSTALL_DIR="/etc/calamares/scripts/postinstall"
 
 pacman -Q gnome-shell    &>/dev/null 2>&1 && GNOME_INSTALLED=true
 pacman -Q plasma-desktop &>/dev/null 2>&1 && KDE_INSTALLED=true
 
 echo "ClariceOS: GNOME=$GNOME_INSTALLED  KDE=$KDE_INSTALLED"
+
+# Load optional post-install modules (PR1: theme modularization).
+[ -f "${POSTINSTALL_DIR}/20-theme-gnome.sh" ] && source "${POSTINSTALL_DIR}/20-theme-gnome.sh"
+[ -f "${POSTINSTALL_DIR}/21-theme-kde.sh" ] && source "${POSTINSTALL_DIR}/21-theme-kde.sh"
 
 # ── Display manager setup ─────────────────────────────────────────────────────
 if $KDE_INSTALLED; then
@@ -55,65 +60,9 @@ else
     echo "WARNING: No desktop environment detected. Skipping DM configuration."
 fi
 
-# ── GNOME Theme: Fluent-gtk-theme ─────────────────────────────────────────────
-if $GNOME_INSTALLED; then
-    echo ">>> Installing Fluent GTK theme..."
-    FLUENT_URL="https://github.com/vinceliuice/Fluent-gtk-theme/archive/refs/heads/master.tar.gz"
-    if curl -fsSL -o /tmp/fluent-gtk-theme.tar.gz "${FLUENT_URL}" 2>/dev/null; then
-        mkdir -p /tmp/fluent-gtk-src
-        tar -xzf /tmp/fluent-gtk-theme.tar.gz -C /tmp/fluent-gtk-src --strip-components=1
-        if [ -x /tmp/fluent-gtk-src/install.sh ]; then
-            bash /tmp/fluent-gtk-src/install.sh -d /usr/share/themes 2>/dev/null || true
-            echo "    Fluent GTK theme installed."
-        else
-            echo "    WARNING: Fluent installer not found in archive."
-        fi
-        rm -rf /tmp/fluent-gtk-src /tmp/fluent-gtk-theme.tar.gz
-    else
-        echo "    WARNING: Could not download Fluent GTK theme (no internet?)."
-    fi
-
-    # Libadwaita consistency check: GTK4 assets must be present for the chosen theme.
-    if [ -d "/usr/share/themes/${GNOME_GTK_THEME}/gtk-4.0" ]; then
-        echo "    Libadwaita/GTK4 visual consistency check passed (${GNOME_GTK_THEME})."
-    else
-        echo "    WARNING: Theme '${GNOME_GTK_THEME}' missing gtk-4.0 assets; libadwaita apps may use defaults."
-    fi
-fi
-
-# ── Compile dconf database (includes font + terminal overrides) ───────────────
-# Ensure the dconf override file has JetBrains Mono and kitty terminal settings.
-mkdir -p /etc/dconf/db/local.d /etc/dconf/profile
-cat > /etc/dconf/profile/user << 'PROFILE'
-user-db:user
-system-db:local
-PROFILE
-
-cat > /etc/dconf/db/local.d/00-clariceos-theme << DCONF
-[org/gnome/desktop/interface]
-gtk-theme='${GNOME_GTK_THEME}'
-icon-theme='Tela-dark'
-cursor-theme='${GNOME_CURSOR_THEME}'
-color-scheme='prefer-dark'
-font-name='JetBrains Mono 11'
-monospace-font-name='JetBrains Mono 11'
-document-font-name='JetBrains Mono 11'
-
-[org/gnome/desktop/wm/preferences]
-theme='${GNOME_GTK_THEME}'
-button-layout=':minimize,maximize,close'
-titlebar-font='JetBrains Mono Bold 11'
-
-[org/gnome/shell/extensions/user-theme]
-name='${GNOME_GTK_THEME}'
-
-[org/gnome/desktop/default-applications/terminal]
-exec='kitty'
-exec-arg=''
-DCONF
-
-if command -v dconf &>/dev/null; then
-    dconf update 2>/dev/null && echo ">>> dconf database updated." || true
+# ── Theme modules (PR1) ───────────────────────────────────────────────────────
+if $GNOME_INSTALLED && command -v apply_gnome_theme >/dev/null 2>&1; then
+    apply_gnome_theme "${GNOME_GTK_THEME}" "${GNOME_CURSOR_THEME}"
 fi
 
 # ── Tela icon theme ───────────────────────────────────────────────────────────
@@ -133,23 +82,8 @@ else
     echo "    WARNING: Could not download Tela icon theme (no internet?). Skipping."
 fi
 
-# ── KDE Theme: Layan-kde ──────────────────────────────────────────────────────
-if $KDE_INSTALLED; then
-    echo ">>> Installing Layan-kde theme..."
-    LAYAN_KDE_URL="https://github.com/vinceliuice/Layan-kde/archive/refs/heads/main.tar.gz"
-    if curl -fsSL -o /tmp/layan-kde.tar.gz "${LAYAN_KDE_URL}" 2>/dev/null; then
-        mkdir -p /tmp/layan-kde-src
-        tar -xzf /tmp/layan-kde.tar.gz -C /tmp/layan-kde-src --strip-components=1
-        if [ -x /tmp/layan-kde-src/install.sh ]; then
-            bash /tmp/layan-kde-src/install.sh 2>/dev/null || true
-            echo "    Layan-kde installed."
-        else
-            echo "    WARNING: Layan-kde installer not found in archive."
-        fi
-        rm -rf /tmp/layan-kde-src /tmp/layan-kde.tar.gz
-    else
-        echo "    WARNING: Could not download Layan-kde (no internet?). Skipping."
-    fi
+if $KDE_INSTALLED && command -v apply_kde_theme >/dev/null 2>&1; then
+    apply_kde_theme
 fi
 
 # ── Apply desktop theme defaults to each new user ─────────────────────────────

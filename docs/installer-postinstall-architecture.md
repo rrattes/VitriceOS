@@ -221,3 +221,8 @@ partition -> mount -> unpackfs
 - **Fase Backend**: reexecução não quebra estado (idempotência).
 - **Fase Boot**: BIOS/UEFI com boot confirmado.
 - **Fase DE**: GNOME/KDE sobem já com tema correto no primeiro login.
+
+## 9.5 Status da trilha (iniciado)
+
+- ✅ **PR 1 iniciado**: temas extraídos para módulos dedicados (`20-theme-gnome.sh` e `21-theme-kde.sh`) com `configure-de.sh` atuando como orquestrador.
+- ⏳ Próximo passo: separar módulos de shell/repos/flatpak/drivers mantendo comportamento atual.
