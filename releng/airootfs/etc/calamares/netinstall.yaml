@@ -21,12 +21,14 @@
     - eog
 
 - name: "KDE Plasma"
-  description: "KDE Plasma Desktop — highly customizable and feature-rich. Requires internet connection."
+  description: "KDE Plasma 6 (KWin/Wayland) — interface moderna, altamente personalizável e com foco em Wayland. Requer internet."
   hidden: false
   selected: false
   critical: false
   packages:
     - plasma-meta
+    - plasma-workspace
+    - kwin
     - plasma-nm
     - plasma-pa
     - plasma-login-manager
