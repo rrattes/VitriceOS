@@ -141,11 +141,12 @@ for home_dir in /home/*/; do
     [ -f "${home_dir}.config/starship.toml" ] || \
         cp /etc/skel/.config/starship.toml "${home_dir}.config/starship.toml" 2>/dev/null || true
 
-    # KDE dotfiles (kdeglobals, plasmarc, kwinrc)
+    # KDE profile: force-apply curated defaults so first boot is already customized.
     if $KDE_INSTALLED; then
-        for conf in kdeglobals plasmarc kwinrc breezerc; do
-            [ -f "${home_dir}.config/${conf}" ] || \
-                cp "/etc/skel/.config/${conf}" "${home_dir}.config/" 2>/dev/null || true
+        for conf in kdeglobals plasmarc kwinrc; do
+            [ -f "/etc/skel/.config/${conf}" ] \
+                && cp -f "/etc/skel/.config/${conf}" "${home_dir}.config/${conf}" 2>/dev/null \
+                || true
         done
     fi
 

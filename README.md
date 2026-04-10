@@ -152,7 +152,7 @@ O script executa dentro do chroot do sistema instalado e realiza:
 - Configuração do Chaotic-AUR e instalação automática do Pamac (`pamac`/`pamac-aur`, com fallback)
 - Adição do Flathub ao Flatpak
 - `chsh -s zsh` para todos os usuários e root
-- Aplicação de dotfiles (kitty, starship, zsh, GTK, KDE) para cada usuário
+- Aplicação de dotfiles (kitty, starship, zsh, GTK, KDE) para cada usuário, com perfil KDE forçado para primeiro boot já customizado
 - Rebuild do initramfs com hook Plymouth
 
 ---
