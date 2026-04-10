@@ -44,7 +44,7 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 |---|---|
 | `pacman` | Gerenciador oficial do Arch Linux |
 | `yay` | AUR helper em linha de comando |
-| `pamac` | Interface gráfica para pacman + AUR |
+| `pamac` / `pamac-aur` | Interface gráfica para pacman + AUR (instalada automaticamente no sistema final) |
 | **Chaotic-AUR** | Repositório de pacotes AUR pré-compilados |
 
 ---
@@ -62,7 +62,7 @@ Instalado por padrão sem necessidade de internet. Inclui:
 
 ### KDE Plasma (opcional, requer internet)
 Selecionável na tela de netinstall. Inclui:
-- Plasma Desktop + SDDM
+- Plasma Desktop + Plasma Login Manager
 - Dolphin, Kate, KCalc
 - Kitty como terminal padrão (`TerminalApplication=kitty`)
 - Dracula via kdeglobals com JetBrains Mono em todas as fontes
@@ -146,10 +146,10 @@ O instalador gráfico Calamares guia o usuário pelos seguintes passos:
 
 ### Pós-instalação automática (`configure-de.sh`)
 O script executa dentro do chroot do sistema instalado e realiza:
-- Configuração do display manager (GDM ou SDDM)
+- Configuração do display manager (GDM ou Plasma Login Manager)
 - Instalação e registro do tema Tela-dark e Plymouth `clariceos`
 - Detecção de GPU e instalação de drivers (NVIDIA dkms, AMD Vulkan, Intel media)
-- Configuração do Chaotic-AUR e instalação do pamac
+- Configuração do Chaotic-AUR e instalação automática do Pamac (`pamac`/`pamac-aur`, com fallback)
 - Adição do Flathub ao Flatpak
 - `chsh -s zsh` para todos os usuários e root
 - Aplicação de dotfiles (kitty, starship, zsh, GTK, KDE) para cada usuário
