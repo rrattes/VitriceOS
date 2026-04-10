@@ -59,7 +59,7 @@ Presentation {
 
             Text {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: qsTr("Dica: GNOME funciona offline; KDE e perfis opcionais exigem internet.")
+                text: qsTr("Dica: primeiro escolha seu perfil de uso e depois selecione o ambiente gráfico (DE).")
                 font.pixelSize: 16
                 color: "#ffffff"
             }

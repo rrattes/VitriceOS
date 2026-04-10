@@ -140,9 +140,10 @@ O instalador gráfico Calamares guia o usuário pelos seguintes passos:
 2. **Localização** — idioma, fuso horário e teclado
 3. **Particionamento** — manual ou automático, com suporte a ext4, btrfs, xfs e f2fs
 4. **Usuário** — criação de conta e senha
-5. **Pacotes opcionais** — GNOME já selecionado; KDE Plasma, Gaming, NVIDIA e Desenvolvimento disponíveis
-6. **Resumo** — revisão antes de instalar
-7. **Instalação** — cópia do sistema, bootloader, pós-configuração automática
+5. **Perfil de uso** — escolha entre Desktop, Gaming, Desenvolvimento e opcionais de driver
+6. **Ambiente gráfico (DE)** — escolha entre GNOME (offline) ou KDE Plasma (requer internet)
+7. **Resumo** — revisão antes de instalar
+8. **Instalação** — cópia do sistema, bootloader, pós-configuração automática
 
 ### Pós-instalação automática (`configure-de.sh`)
 O script executa dentro do chroot do sistema instalado e realiza:
@@ -177,7 +178,8 @@ releng/
 │   │   │   │   ├── install-bootloader.sh  # Instala Limine (BIOS + UEFI)
 │   │   │   │   ├── btrfs-hooks.sh         # Hook btrfs no mkinitcpio
 │   │   │   │   └── setup-secureboot.sh    # Configura Secure Boot via sbctl
-│   │   │   └── netinstall.yaml            # Grupos: GNOME, KDE, Gaming, NVIDIA, Dev
+│   │   │   ├── netinstall-profile.yaml    # Etapa 1: perfil de uso (Desktop/Gaming/Dev/NVIDIA)
+│   │   │   └── netinstall-desktop.yaml    # Etapa 2: ambiente gráfico (GNOME/KDE)
 │   │   ├── dconf/db/local.d/
 │   │   │   └── 00-clariceos-theme         # Defaults GNOME: Fluent-Dark, Tela-dark, Kitty, JetBrains Mono
 │   │   ├── plymouth/
