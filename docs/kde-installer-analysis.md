@@ -9,7 +9,7 @@ Fortalecer a opção KDE para o cenário atual do Plasma (Wayland + KWin), reduz
 ## Ajustes aplicados
 1. **Netinstall KDE atualizado** para destacar Plasma 6 com KWin/Wayland.
 2. Inclusão explícita de `plasma-workspace` e `kwin` na seleção KDE para garantir componentes centrais da sessão.
-3. No `configure-de.sh`, o SDDM passa a preferir automaticamente `plasma.desktop` quando a sessão Wayland está disponível (`/usr/share/wayland-sessions/plasma.desktop`).
+3. No `configure-de.sh`, o instalador habilita `plasmalogin.service` (Plasma Login Manager) em vez de SDDM para instalações KDE.
 
 ## Benefícios
 - Melhora a clareza para o usuário no momento da instalação.
@@ -22,5 +22,5 @@ Fortalecer a opção KDE para o cenário atual do Plasma (Wayland + KWin), reduz
 
 ## Próximos passos sugeridos
 - Validar em VM com duas execuções: opção GNOME e opção KDE.
-- Confirmar tela de login SDDM iniciando sessão Plasma conforme esperado.
+- Confirmar tela de login do Plasma Login Manager iniciando sessão Plasma conforme esperado.
 - (Opcional) adicionar teste smoke específico para presença de `/usr/share/wayland-sessions/plasma.desktop` no sistema instalado.

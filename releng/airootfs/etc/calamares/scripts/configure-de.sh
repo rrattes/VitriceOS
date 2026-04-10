@@ -14,29 +14,11 @@ echo "ClariceOS: GNOME=$GNOME_INSTALLED  KDE=$KDE_INSTALLED"
 
 # ── Display manager setup ─────────────────────────────────────────────────────
 if $KDE_INSTALLED; then
-    echo ">>> Configuring KDE Plasma + SDDM"
+    echo ">>> Configuring KDE Plasma + Plasma Login Manager"
 
-    systemctl enable  sddm.service 2>/dev/null || true
-    systemctl disable gdm.service  2>/dev/null || true
-
-    mkdir -p /etc/sddm.conf.d
-
-    # Prefer KDE Plasma Wayland session (KWin) when available.
-    KDE_SESSION=""
-    if [ -f /usr/share/wayland-sessions/plasma.desktop ]; then
-        KDE_SESSION="plasma.desktop"
-    fi
-
-    cat > /etc/sddm.conf.d/clariceos.conf << EOF
-[Autologin]
-Relogin=false
-Session=${KDE_SESSION}
-User=
-
-[General]
-HaltCommand=/usr/bin/systemctl poweroff
-RebootCommand=/usr/bin/systemctl reboot
-EOF
+    systemctl enable  plasmalogin.service 2>/dev/null || true
+    systemctl disable gdm.service          2>/dev/null || true
+    systemctl disable sddm.service         2>/dev/null || true
 
     # Remove GNOME if present (user chose KDE exclusively)
     if $GNOME_INSTALLED; then
@@ -50,7 +32,8 @@ elif $GNOME_INSTALLED; then
     echo ">>> Configuring GNOME + GDM"
 
     systemctl enable  gdm.service  2>/dev/null || true
-    systemctl disable sddm.service 2>/dev/null || true
+    systemctl disable plasmalogin.service 2>/dev/null || true
+    systemctl disable sddm.service        2>/dev/null || true
 
     # Switch GDM autologin from the live 'live' user to the installed user.
     # The live ISO ships AutomaticLogin=live; we replace it with the real user.
