@@ -372,7 +372,7 @@ install_gpu_drivers() {
 
 install_gpu_drivers || true
 
-# ── Plymouth Dracula theme — deploy to installed system ───────────────────────
+# ── Plymouth Clarice theme — deploy to installed system ───────────────────────
 echo ">>> Installing ClariceOS Plymouth theme..."
 if command -v plymouth &>/dev/null; then
     PLYDIR="/usr/share/plymouth/themes/clariceos"
@@ -382,7 +382,7 @@ if command -v plymouth &>/dev/null; then
     cat > "${PLYDIR}/clariceos.plymouth" << 'PLYDESC'
 [Plymouth Theme]
 Name=ClariceOS
-Description=ClariceOS — Dracula boot splash
+Description=ClariceOS — Clarice boot splash
 ModuleName=script
 
 [script]
@@ -392,7 +392,7 @@ PLYDESC
 
     # Plymouth script
     cat > "${PLYDIR}/clariceos.script" << 'PLYSCRIPT'
-// ClariceOS Plymouth Theme — Dracula colour palette
+// ClariceOS Plymouth Theme — Clarice colour palette
 width  = Window.GetWidth();
 height = Window.GetHeight();
 

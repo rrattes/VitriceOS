@@ -1,6 +1,6 @@
 # ClariceOS
 
-ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabilidade e estética coesa. Vem com instalador gráfico completo, tema **Fluent** no GNOME e **Layan-kde** no KDE, além de identidade Dracula no terminal/boot splash, suporte a GNOME e KDE Plasma, bootloader Limine moderno e suporte nativo a btrfs com snapshots automáticos.
+ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabilidade e estética coesa. Vem com instalador gráfico completo, tema **Fluent** no GNOME e **Layan-kde** no KDE, além de identidade Clarice no terminal/boot splash, suporte a GNOME e KDE Plasma, bootloader Limine moderno e suporte nativo a btrfs com snapshots automáticos.
 
 ---
 
@@ -27,10 +27,10 @@ ClariceOS é uma distribuição Linux baseada em Arch Linux, com foco em usabili
 | **Tema de ícones** | Tela-dark |
 | **Tema de cursor** | Adwaita |
 | **Fonte do sistema** | JetBrains Mono 11 (UI, monospace, documentos) |
-| **Terminal** | Kitty — tema Dracula completo, tab bar powerline |
+| **Terminal** | Kitty — tema Clarice completo, tab bar powerline |
 | **Fonte do terminal** | JetBrainsMono Nerd Font 12pt |
 | **Shell** | ZSH + autosuggestions + syntax-highlighting + history-substring-search |
-| **Prompt** | Starship — paleta Dracula (diretório cyan, branch pink, `❯` green) |
+| **Prompt** | Starship — paleta Clarice (diretório cyan, branch pink, `❯` green) |
 | **Boot splash** | Plymouth tema `clariceos` (fundo `#282a36`, barra `#bd93f9`) |
 | **KDE** | Layan-kde via kdeglobals, plasmarc e kwinrc |
 | **GNOME** | Fluent-Dark via dconf system-wide database |
@@ -82,7 +82,7 @@ O ClariceOS usa **ZSH** como shell padrão para todos os usuários, com os segui
 | `zsh-completions` | Completions extras para centenas de comandos |
 | `starship` | Prompt rápido escrito em Rust |
 
-O prompt **Starship** usa a paleta Dracula completa e exibe: diretório, branch git, status git, linguagem do projeto e duração do último comando.
+O prompt **Starship** usa a paleta Clarice completa e exibe: diretório, branch git, status git, linguagem do projeto e duração do último comando.
 
 ---
 
@@ -90,8 +90,8 @@ O prompt **Starship** usa a paleta Dracula completa e exibe: diretório, branch 
 
 - **Emulador:** Kitty (GPU-accelerated)
 - **Fonte:** JetBrainsMono Nerd Font 12pt (suporte completo a ícones Nerd Font)
-- **Tema:** Dracula — cores alinhadas com todo o sistema (borda ativa `#bd93f9`, marks com cores do accent)
-- **Tab bar:** powerline style, cores Dracula
+- **Tema:** Clarice — cores alinhadas com todo o sistema (borda ativa `#bd93f9`, marks com cores do accent)
+- **Tab bar:** powerline style, cores Clarice
 - **Scrollback:** 10.000 linhas
 - Configurado como terminal padrão no GNOME (dconf) e KDE (kdeglobals)
 - `TERMINAL=kitty` em `/etc/environment`
@@ -102,10 +102,10 @@ O prompt **Starship** usa a paleta Dracula completa e exibe: diretório, branch 
 
 O ClariceOS usa o tema `clariceos` (módulo `script` do Plymouth):
 
-- **Fundo:** `#282a36` (Dracula background)
-- **Barra de progresso:** `#bd93f9` (Dracula purple)
-- **Trilho da barra:** `#44475a` (Dracula comment)
-- **Texto:** `#f8f8f2` (Dracula foreground)
+- **Fundo:** `#282a36` (Clarice background)
+- **Barra de progresso:** `#bd93f9` (Clarice accent)
+- **Trilho da barra:** `#44475a` (Clarice neutral)
+- **Texto:** `#f8f8f2` (Clarice foreground)
 
 Os assets PNG são gerados automaticamente via Python3 stdlib durante o build da ISO.
 
@@ -183,17 +183,17 @@ releng/
 │   │   ├── plymouth/
 │   │   │   └── plymouthd.conf             # Theme=clariceos
 │   │   ├── skel/.config/
-│   │   │   ├── kitty/kitty.conf           # Tema Dracula + JetBrainsMono Nerd Font
-│   │   │   ├── starship.toml              # Prompt Starship paleta Dracula
+│   │   │   ├── kitty/kitty.conf           # Tema Clarice + JetBrainsMono Nerd Font
+│   │   │   ├── starship.toml              # Prompt Starship paleta Clarice
 │   │   │   ├── gtk-3.0/settings.ini
 │   │   │   ├── gtk-4.0/settings.ini
-│   │   │   └── kdeglobals                 # KDE: Dracula, Tela-dark, JetBrains Mono, Kitty
+│   │   │   └── kdeglobals                 # KDE: Layan, Tela-dark, JetBrains Mono, Kitty
 │   │   ├── skel/.zshrc                    # ZSH: plugins + starship init
 │   │   ├── environment                    # TERMINAL=kitty, Wayland flags
 │   │   └── systemd/zram-generator.conf
 │   └── usr/share/plymouth/themes/clariceos/
 │       ├── clariceos.plymouth
-│       └── clariceos.script               # Tema Dracula para boot splash
+│       └── clariceos.script               # Tema Clarice para boot splash
 ```
 
 ---
