@@ -3,7 +3,7 @@ source /usr/local/lib/vitrice-installer/common.sh
 
 log "Bootstrap do sistema base"
 
-run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager grub efibootmgr"
+run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager efibootmgr"
 run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 
 cat > "${VITRICE_TARGET}/root/vitrice-post-chroot.sh" <<CHROOT
@@ -29,8 +29,21 @@ echo '${VITRICE_USERNAME}:${VITRICE_USER_PASSWORD}' | chpasswd
 usermod -U root || true
 usermod -U '${VITRICE_USERNAME}' || true
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=VitriceOS
-grub-mkconfig -o /boot/grub/grub.cfg
+bootctl --path=/boot install
+mkdir -p /boot/loader/entries
+cat > /boot/loader/loader.conf <<LOADER
+default vitr.conf
+timeout 3
+editor no
+LOADER
+ROOT_UUID="$(blkid -s UUID -o value '${ROOT_PART}')"
+cat > /boot/loader/entries/vitr.conf <<ENTRY
+title VitriceOS
+linux /vmlinuz-linux
+initrd /initramfs-linux.img
+initrd /initramfs-linux-fallback.img
+options root=UUID=${ROOT_UUID} rw
+ENTRY
 rm -f /root/vitrice-post-chroot.sh
 CHROOT
 

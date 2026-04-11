@@ -29,7 +29,8 @@ Etapas atuais:
 2. particionamento GPT automático (EFI + root ext4);
 3. bootstrap com `pacstrap`;
 4. configuração em `arch-chroot`;
-5. finalização e desmontagem.
+5. configuração de boot com `systemd-boot` (UEFI);
+6. finalização e desmontagem.
 
 ### Modo seguro para desenvolvimento
 
