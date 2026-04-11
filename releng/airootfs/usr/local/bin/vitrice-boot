@@ -1,31 +1,10 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -eEo pipefail
+
+ansi_art='VitriceOS Installer'
 
 [[ "$(tty 2>/dev/null || true)" == "/dev/tty1" ]] || exit 0
-[[ -t 0 && -t 1 ]] || exit 0
-
 clear || true
-echo "VitriceOS Live"
-echo "Instalador script-first"
-echo
-read -r -p "Iniciar instalação agora? [Y/n]: " ans
-ans="${ans:-Y}"
-case "${ans}" in
-  [Yy]*) ;;
-  *)
-    echo "Modo manual: VITRICE_DISK=/dev/sdX vitrice-install"
-    exit 0
-    ;;
-esac
+echo -e "\n${ansi_art}\n"
 
-while true; do
-  read -r -p "Disco alvo (ex: /dev/nvme0n1): " disk
-  [[ -n "${disk}" ]] || continue
-  if [[ ! -b "${disk}" ]]; then
-    echo "Dispositivo inválido: ${disk}"
-    continue
-  fi
-  export VITRICE_DISK="${disk}"
-  exec vitrice-install
-  break
-done
+exec vitrice-install

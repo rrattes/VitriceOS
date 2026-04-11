@@ -6,9 +6,12 @@ require_root
 require_cmds lsblk parted mkfs.fat mkfs.ext4 pacstrap genfstab arch-chroot
 
 if [[ -z "${VITRICE_DISK:-}" ]]; then
-  die "defina VITRICE_DISK (ex: /dev/nvme0n1)"
+  echo "Discos disponíveis:"
+  lsblk -dpno NAME,SIZE,MODEL,TYPE | awk '$4=="disk" {print "  "$1"  "$2"  "$3}'
+  read -r -p "Informe o disco alvo (ex: /dev/nvme0n1): " VITRICE_DISK
 fi
 
+[[ -n "${VITRICE_DISK}" ]] || die "disco alvo não informado"
 [[ -b "${VITRICE_DISK}" ]] || die "disco inválido: ${VITRICE_DISK}"
 
 log "Resumo da instalação"
