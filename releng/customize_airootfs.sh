@@ -248,6 +248,8 @@ menuFont=JetBrains Mono,11,-1,5,50,0,0,0,0,0
 activeFont=JetBrains Mono,11,-1,5,75,0,0,0,0,0
 TerminalApplication=kitty
 TerminalService=kitty.desktop
+BrowserApplication=org.kde.falkon.desktop
+BrowserService=org.kde.falkon.desktop
 
 [KDE]
 ColorScheme=Layan

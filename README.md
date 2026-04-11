@@ -63,7 +63,7 @@ Instalado por padrão sem necessidade de internet. Inclui:
 ### KDE Plasma (opcional, requer internet)
 Selecionável na tela de netinstall. Inclui:
 - Plasma Desktop + Plasma Login Manager
-- Dolphin, Kate, KCalc
+- Dolphin, Kate, KCalc e Falkon (navegador padrão no KDE)
 - Kitty como terminal padrão (`TerminalApplication=kitty`)
 - Layan-kde aplicado via kdeglobals/plasmarc/kwinrc com JetBrains Mono
 - Ícones Tela-dark
