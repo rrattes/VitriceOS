@@ -10,7 +10,7 @@ run "parted -s '${VITRICE_DISK}' mkpart ESP fat32 1MiB 513MiB"
 run "parted -s '${VITRICE_DISK}' set 1 esp on"
 run "parted -s '${VITRICE_DISK}' mkpart root ext4 513MiB 100%"
 
-if [[ "${VITRICE_DISK}" == *"nvme"* ]]; then
+if [[ "${VITRICE_DISK}" =~ [0-9]$ ]]; then
   EFI_PART="${VITRICE_DISK}p1"
   ROOT_PART="${VITRICE_DISK}p2"
 else
