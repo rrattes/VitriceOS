@@ -12,11 +12,17 @@ Este repositório agora tem foco em um **instalador orientado a scripts**, inspi
 
 ## Instalador (script-first)
 
-No live ISO, o comando principal é:
+No live ISO, um prompt de instalação abre automaticamente no tty1 (estilo Omarchy).
+
+Comando manual:
 
 ```bash
 VITRICE_DISK=/dev/sdX vitrice-install
 ```
+
+Senha padrão inicial (altere após primeiro boot):
+- root: `vitrice`
+- usuário padrão (`vitrice`): `vitrice`
 
 Etapas atuais:
 1. pre-flight (validação de comandos/variáveis);

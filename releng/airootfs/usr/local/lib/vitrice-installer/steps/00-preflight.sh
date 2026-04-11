@@ -19,3 +19,6 @@ printf '  Timezone: %s\n' "${VITRICE_TIMEZONE}"
 printf '  Locale: %s\n' "${VITRICE_LOCALE}"
 printf '  Keymap: %s\n' "${VITRICE_KEYMAP}"
 printf '  Dry-run: %s\n' "${VITRICE_DRY_RUN}"
+
+printf '  Senha root definida: %s\n' "$([[ -n "${VITRICE_ROOT_PASSWORD}" ]] && echo sim || echo nao)"
+printf '  Senha usuário definida: %s\n' "$([[ -n "${VITRICE_USER_PASSWORD}" ]] && echo sim || echo nao)"
