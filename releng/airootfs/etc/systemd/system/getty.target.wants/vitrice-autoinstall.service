@@ -1,1 +1,1 @@
-../vitrice-autoinstall.service
+/etc/systemd/system/vitrice-autoinstall.service

@@ -4,14 +4,13 @@ linux-firmware
 mkinitcpio
 mkinitcpio-archiso
 arch-install-scripts
-archinstall
 parted
 dosfstools
-e2fsprogs
+btrfs-progs
+limine
 nano
 vim
 sudo
 networkmanager
-grub
 efibootmgr
 syslinux
