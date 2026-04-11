@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export VITRICE_INSTALL_ROOT="/usr/local/lib/vitrice-installer"
+
+if [[ "${1:-}" == "--help" ]]; then
+  cat <<HELP
+Uso:
+  VITRICE_DISK=/dev/sdX vitrice-install
+
+Variáveis opcionais:
+  VITRICE_HOSTNAME=vitriceos
+  VITRICE_USERNAME=vitrice
+  VITRICE_TIMEZONE=UTC
+  VITRICE_LOCALE=en_US.UTF-8
+  VITRICE_KEYMAP=us
+  VITRICE_DRY_RUN=1
+HELP
+  exit 0
+fi
+
+for step in \
+  "$VITRICE_INSTALL_ROOT/steps/00-preflight.sh" \
+  "$VITRICE_INSTALL_ROOT/steps/10-partition.sh" \
+  "$VITRICE_INSTALL_ROOT/steps/20-bootstrap.sh" \
+  "$VITRICE_INSTALL_ROOT/steps/30-finish.sh"
+do
+  # shellcheck disable=SC1090
+  source "$step"
+done

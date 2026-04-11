@@ -1,26 +1,39 @@
 # VitriceOS
 
-VitriceOS é uma distro Linux **baseada em Arch Linux**, com foco em ser um projeto limpo para desenvolvimento de uma ISO instalável.
+VitriceOS é uma distro Linux **baseada em Arch Linux**.
 
-## Objetivo desta fase
+Este repositório agora tem foco em um **instalador orientado a scripts**, inspirado no fluxo do projeto Omarchy (basecamp/omarchy), mas adaptado para o nosso SO e para um começo limpo.
 
-Este repositório foi reduzido para um **esqueleto mínimo**, mantendo apenas o necessário para:
+## Objetivo atual
 
-- gerar ISO com `mkarchiso`;
-- preservar base Arch;
-- facilitar evolução incremental sem acoplamentos desnecessários.
+- manter ISO instalável via `mkarchiso`;
+- concentrar o processo em scripts simples, auditáveis e versionados;
+- evitar acoplamentos que atrapalhem evolução do instalador.
 
-## Estrutura atual
+## Instalador (script-first)
 
-- `build.sh`: script simples para build da ISO.
-- `releng/`: perfil ArchISO mínimo.
-  - `profiledef.sh`
-  - `packages.x86_64`
-  - `pacman.conf`
-  - `customize_airootfs.sh`
-  - arquivos de boot (grub/syslinux/efiboot)
+No live ISO, o comando principal é:
 
-## Build rápido
+```bash
+VITRICE_DISK=/dev/sdX vitrice-install
+```
+
+Etapas atuais:
+1. pre-flight (validação de comandos/variáveis);
+2. particionamento GPT automático (EFI + root ext4);
+3. bootstrap com `pacstrap`;
+4. configuração em `arch-chroot`;
+5. finalização e desmontagem.
+
+### Modo seguro para desenvolvimento
+
+Para validar fluxo sem alterar disco:
+
+```bash
+VITRICE_DISK=/dev/sdX VITRICE_DRY_RUN=1 vitrice-install
+```
+
+## Build da ISO
 
 ```bash
 sudo ./build.sh

@@ -20,4 +20,10 @@ file_permissions=(
   ["/etc/shadow"]="0:0:400"
   ["/etc/gshadow"]="0:0:400"
   ["/root"]="0:0:750"
+  ["/usr/local/bin/vitrice-install"]="0:0:755"
+  ["/usr/local/lib/vitrice-installer/common.sh"]="0:0:755"
+  ["/usr/local/lib/vitrice-installer/steps/00-preflight.sh"]="0:0:755"
+  ["/usr/local/lib/vitrice-installer/steps/10-partition.sh"]="0:0:755"
+  ["/usr/local/lib/vitrice-installer/steps/20-bootstrap.sh"]="0:0:755"
+  ["/usr/local/lib/vitrice-installer/steps/30-finish.sh"]="0:0:755"
 )

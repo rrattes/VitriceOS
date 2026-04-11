@@ -1,0 +1,6 @@
+VitriceOS Live ISO
+
+Instalador em script:
+  VITRICE_DISK=/dev/sdX vitrice-install
+
+Dica: teste sem tocar no disco com VITRICE_DRY_RUN=1.

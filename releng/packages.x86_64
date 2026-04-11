@@ -5,6 +5,9 @@ mkinitcpio
 mkinitcpio-archiso
 arch-install-scripts
 archinstall
+parted
+dosfstools
+e2fsprogs
 nano
 vim
 sudo
