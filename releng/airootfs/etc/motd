@@ -1,9 +1,6 @@
 VitriceOS Live ISO
 
-O launcher do instalador inicia automaticamente no TTY1.
-Pressione ENTER no prompt para cancelar e abrir shell manual.
-
-Modo manual:
+Instalador em script:
   VITRICE_DISK=/dev/sdX vitrice-install
 
 Dica: teste sem tocar no disco com VITRICE_DRY_RUN=1.
