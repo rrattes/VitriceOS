@@ -24,6 +24,8 @@ cat > /etc/hosts <<HOSTS
 HOSTS
 systemctl enable NetworkManager
 useradd -m -G wheel -s /bin/bash '${VITRICE_USERNAME}' || true
+echo 'root:${VITRICE_ROOT_PASSWORD}' | chpasswd
+echo '${VITRICE_USERNAME}:${VITRICE_USER_PASSWORD}' | chpasswd
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=VitriceOS
 grub-mkconfig -o /boot/grub/grub.cfg
