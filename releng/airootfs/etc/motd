@@ -1,6 +1,12 @@
 VitriceOS Live ISO
 
+O prompt automático do instalador abre no tty1 após boot.
+
 Instalador em script:
   VITRICE_DISK=/dev/sdX vitrice-install
+
+Senha padrão inicial no sistema instalado:
+  root: vitrice
+  usuário vitrice: vitrice
 
 Dica: teste sem tocar no disco com VITRICE_DRY_RUN=1.
