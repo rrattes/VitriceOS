@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+set -eEo pipefail
+
+ansi_art='VitriceOS Installer'
+
+[[ "$(tty 2>/dev/null || true)" == "/dev/tty1" ]] || exit 0
+clear || true
+echo -e "\n${ansi_art}\n"
+
+exec vitrice-install

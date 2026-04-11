@@ -7,6 +7,8 @@ set -euo pipefail
 : "${VITRICE_TIMEZONE:=UTC}"
 : "${VITRICE_LOCALE:=en_US.UTF-8}"
 : "${VITRICE_KEYMAP:=us}"
+: "${VITRICE_ROOT_PASSWORD:=vitrice}"
+: "${VITRICE_USER_PASSWORD:=vitrice}"
 : "${VITRICE_DRY_RUN:=0}"
 
 log() { printf '\n==> %s\n' "$*"; }

@@ -6,9 +6,12 @@ require_root
 require_cmds lsblk parted mkfs.fat mkfs.ext4 pacstrap genfstab arch-chroot
 
 if [[ -z "${VITRICE_DISK:-}" ]]; then
-  die "defina VITRICE_DISK (ex: /dev/nvme0n1)"
+  echo "Discos disponíveis:"
+  lsblk -dpno NAME,SIZE,MODEL,TYPE | awk '$4=="disk" {print "  "$1"  "$2"  "$3}'
+  read -r -p "Informe o disco alvo (ex: /dev/nvme0n1): " VITRICE_DISK
 fi
 
+[[ -n "${VITRICE_DISK}" ]] || die "disco alvo não informado"
 [[ -b "${VITRICE_DISK}" ]] || die "disco inválido: ${VITRICE_DISK}"
 
 log "Resumo da instalação"
@@ -19,3 +22,6 @@ printf '  Timezone: %s\n' "${VITRICE_TIMEZONE}"
 printf '  Locale: %s\n' "${VITRICE_LOCALE}"
 printf '  Keymap: %s\n' "${VITRICE_KEYMAP}"
 printf '  Dry-run: %s\n' "${VITRICE_DRY_RUN}"
+
+printf '  Senha root definida: %s\n' "$([[ -n "${VITRICE_ROOT_PASSWORD}" ]] && echo sim || echo nao)"
+printf '  Senha usuário definida: %s\n' "$([[ -n "${VITRICE_USER_PASSWORD}" ]] && echo sim || echo nao)"
