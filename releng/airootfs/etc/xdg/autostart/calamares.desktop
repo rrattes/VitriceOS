@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Install Clarice OS
-Comment=Start Calamares installer on login
-Exec=pkexec calamares
-Icon=calamares
-Terminal=false
-X-GNOME-Autostart-enabled=true
-NoDisplay=true
