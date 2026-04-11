@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Executa automaticamente no boot do live ISO (TTY1).
+# Pede o disco alvo e dispara o instalador principal.
+
+if [[ ! -t 0 || ! -t 1 ]]; then
+  exit 0
+fi
+
+if [[ "${TERM:-}" == "dumb" ]]; then
+  exit 0
+fi
+
+current_tty="$(tty 2>/dev/null || true)"
+if [[ "${current_tty}" != "/dev/tty1" ]]; then
+  exit 0
+fi
+
+if [[ "${VITRICE_AUTO_INSTALL_STARTED:-0}" == "1" ]]; then
+  exit 0
+fi
+
+export VITRICE_AUTO_INSTALL_STARTED=1
+
+echo
+printf '=== VitriceOS Installer ===\n'
+printf 'Esse assistente inicia automaticamente no boot da ISO.\n\n'
+
+while true; do
+  read -r -p "Disco alvo (ex: /dev/nvme0n1) ou ENTER para abrir shell: " target_disk
+
+  if [[ -z "${target_disk}" ]]; then
+    echo "Instalação automática cancelada. Você pode rodar manualmente:"
+    echo "  VITRICE_DISK=/dev/sdX vitrice-install"
+    exit 0
+  fi
+
+  if [[ ! -b "${target_disk}" ]]; then
+    echo "Dispositivo inválido: ${target_disk}"
+    continue
+  fi
+
+  export VITRICE_DISK="${target_disk}"
+  exec vitrice-install
+  break
+
+done

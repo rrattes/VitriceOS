@@ -12,7 +12,9 @@ Este repositório agora tem foco em um **instalador orientado a scripts**, inspi
 
 ## Instalador (script-first)
 
-No live ISO, o comando principal é:
+Ao iniciar o live ISO, um launcher em TTY1 sobe automaticamente e solicita o disco alvo para executar o instalador.
+
+Comando manual (fallback):
 
 ```bash
 VITRICE_DISK=/dev/sdX vitrice-install
