@@ -4,14 +4,15 @@ source /usr/local/lib/vitrice-installer/common.sh
 log "Bootstrap do sistema base"
 
 run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager grub efibootmgr"
-run "genfstab -U '${VITRICE_TARGET}' >> '${VITRICE_TARGET}/etc/fstab'"
+run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 
 cat > "${VITRICE_TARGET}/root/vitrice-post-chroot.sh" <<CHROOT
 #!/usr/bin/env bash
 set -euo pipefail
+escaped_locale="$(printf '%s' "${VITRICE_LOCALE}" | sed 's/[.[\*^$()+?{}|/]/\\&/g')"
 ln -sf /usr/share/zoneinfo/${VITRICE_TIMEZONE} /etc/localtime
 hwclock --systohc
-sed -i 's/^#${VITRICE_LOCALE}/${VITRICE_LOCALE}/' /etc/locale.gen
+sed -i "s/^#${escaped_locale}/${VITRICE_LOCALE}/" /etc/locale.gen
 locale-gen
 echo 'LANG=${VITRICE_LOCALE}' > /etc/locale.conf
 echo 'KEYMAP=${VITRICE_KEYMAP}' > /etc/vconsole.conf
