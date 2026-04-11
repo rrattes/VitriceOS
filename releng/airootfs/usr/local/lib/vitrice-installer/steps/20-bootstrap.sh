@@ -12,7 +12,7 @@ set -euo pipefail
 escaped_locale="$(printf '%s' "${VITRICE_LOCALE}" | sed 's/[.[\*^$()+?{}|/]/\\&/g')"
 ln -sf /usr/share/zoneinfo/${VITRICE_TIMEZONE} /etc/localtime
 hwclock --systohc
-sed -i "s/^#${escaped_locale}/${VITRICE_LOCALE}/" /etc/locale.gen
+sed -i "s/^#${VITRICE_LOCALE}/${VITRICE_LOCALE}/" /etc/locale.gen
 locale-gen
 echo 'LANG=${VITRICE_LOCALE}' > /etc/locale.conf
 echo 'KEYMAP=${VITRICE_KEYMAP}' > /etc/vconsole.conf
@@ -26,6 +26,8 @@ systemctl enable NetworkManager
 useradd -m -G wheel -s /bin/bash '${VITRICE_USERNAME}' || true
 echo 'root:${VITRICE_ROOT_PASSWORD}' | chpasswd
 echo '${VITRICE_USERNAME}:${VITRICE_USER_PASSWORD}' | chpasswd
+usermod -U root || true
+usermod -U '${VITRICE_USERNAME}' || true
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=VitriceOS
 grub-mkconfig -o /boot/grub/grub.cfg
