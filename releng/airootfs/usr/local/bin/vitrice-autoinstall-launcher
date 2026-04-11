@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Executa automaticamente no login inicial do live ISO (TTY1).
+# Executa automaticamente no boot do live ISO (TTY1).
 # Pede o disco alvo e dispara o instalador principal.
 
 if [[ ! -t 0 || ! -t 1 ]]; then
@@ -9,6 +9,11 @@ if [[ ! -t 0 || ! -t 1 ]]; then
 fi
 
 if [[ "${TERM:-}" == "dumb" ]]; then
+  exit 0
+fi
+
+current_tty="$(tty 2>/dev/null || true)"
+if [[ "${current_tty}" != "/dev/tty1" ]]; then
   exit 0
 fi
 
