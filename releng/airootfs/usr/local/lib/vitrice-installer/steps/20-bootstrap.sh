@@ -9,6 +9,7 @@ run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 cat > "${VITRICE_TARGET}/root/vitrice-post-chroot.sh" <<CHROOT
 #!/usr/bin/env bash
 set -euo pipefail
+escaped_locale="$(printf '%s' "${VITRICE_LOCALE}" | sed 's/[.[\*^$()+?{}|/]/\\&/g')"
 ln -sf /usr/share/zoneinfo/${VITRICE_TIMEZONE} /etc/localtime
 hwclock --systohc
 sed -i "s/^#${VITRICE_LOCALE}/${VITRICE_LOCALE}/" /etc/locale.gen
