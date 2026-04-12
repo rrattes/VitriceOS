@@ -3,7 +3,7 @@ source /usr/local/lib/vitrice-installer/common.sh
 
 log "Bootstrap do sistema base"
 
-run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs"
+run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs efibootmgr"
 run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 
 ROOT_UUID="$(blkid -s UUID -o value "${ROOT_PART}")"
