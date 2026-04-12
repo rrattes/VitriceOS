@@ -3,7 +3,7 @@ source /usr/local/lib/vitrice-installer/common.sh
 
 log "Bootstrap do sistema base"
 
-run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs efibootmgr"
+run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs efibootmgr plasma plasma-login-manager dolphin konsole pipewire wireplumber pipewire-pulse xdg-desktop-portal-kde"
 run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 
 ROOT_UUID="$(blkid -s UUID -o value "${ROOT_PART}")"
@@ -35,6 +35,9 @@ echo '${VITRICE_USERNAME}:${VITRICE_USER_PASSWORD}' | chpasswd
 usermod -U root || true
 usermod -U '${VITRICE_USERNAME}' || true
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
+
+# ── KDE Plasma 6 + Plasma Login Manager ──────────────────────────────────────
+systemctl enable plasmalogin
 
 # ── Limine bootloader ────────────────────────────────────────────────────────
 #
