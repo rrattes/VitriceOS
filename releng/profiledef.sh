@@ -3,7 +3,7 @@
 
 iso_name="VitriceOS"
 iso_label="VITRICE_$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y%m)"
-iso_publisher="VitriceOS <https://example.org>"
+iso_publisher="VitriceOS <https://github.com/rrattes/VitriceOS>"
 iso_application="VitriceOS Live ISO"
 iso_version="$(date --date="@${SOURCE_DATE_EPOCH:-$(date +%s)}" +%Y.%m.%d)"
 install_dir="arch"
