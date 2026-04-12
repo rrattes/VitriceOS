@@ -3,7 +3,7 @@ source /usr/local/lib/vitrice-installer/common.sh
 
 log "Bootstrap do sistema base"
 
-run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs efibootmgr plasma sddm dolphin konsole pipewire wireplumber pipewire-pulse xdg-desktop-portal-kde"
+run "pacstrap -K '${VITRICE_TARGET}' base linux linux-firmware sudo networkmanager limine btrfs-progs efibootmgr"
 run "genfstab -U '${VITRICE_TARGET}' > '${VITRICE_TARGET}/etc/fstab'"
 
 ROOT_UUID="$(blkid -s UUID -o value "${ROOT_PART}")"
@@ -35,20 +35,6 @@ echo '${VITRICE_USERNAME}:${VITRICE_USER_PASSWORD}' | chpasswd
 usermod -U root || true
 usermod -U '${VITRICE_USERNAME}' || true
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
-
-# ── KDE Plasma 6 + SDDM (Plasma login manager) ──────────────────────────────
-systemctl enable sddm
-
-# SDDM configurado para sessão Wayland nativa (padrão do Plasma 6)
-mkdir -p /etc/sddm.conf.d
-cat > /etc/sddm.conf.d/plasma-wayland.conf <<SDDMCFG
-[General]
-DisplayServer=wayland
-GreeterEnvironment=QT_WAYLAND_SHELL_INTEGRATION=layer-shell
-
-[Wayland]
-CompositorCommand=kwin_wayland --drm --no-lockscreen --no-global-shortcuts --locale1
-SDDMCFG
 
 # ── Limine bootloader ────────────────────────────────────────────────────────
 #
