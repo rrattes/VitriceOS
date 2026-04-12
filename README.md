@@ -26,10 +26,10 @@ Senha padrão inicial (altere após primeiro boot):
 
 Etapas atuais:
 1. pre-flight (validação de comandos/variáveis);
-2. particionamento GPT automático (EFI + root ext4);
-3. bootstrap com `pacstrap`;
-4. configuração em `arch-chroot`;
-5. configuração de boot com `systemd-boot` (UEFI);
+2. particionamento GPT automático (ESP + root Btrfs com subvolumes `@` e `@home`);
+3. bootstrap com `pacstrap` (base, KDE Plasma 6, Plasma Login Manager, Limine…);
+4. configuração em `arch-chroot` (locale, rede, usuário, `plasmalogin.service`);
+5. configuração de boot com **Limine** (UEFI e BIOS/MBR);
 6. finalização e desmontagem.
 
 ### Modo seguro para desenvolvimento
