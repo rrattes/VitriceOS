@@ -3,7 +3,7 @@ source /usr/local/lib/vitrice-installer/common.sh
 
 log "Pre-flight"
 require_root
-require_cmds lsblk parted mkfs.fat mkfs.ext4 pacstrap genfstab arch-chroot
+require_cmds lsblk parted mkfs.fat mkfs.btrfs btrfs pacstrap genfstab arch-chroot
 
 if [[ -z "${VITRICE_DISK:-}" ]]; then
   echo "Discos disponíveis:"

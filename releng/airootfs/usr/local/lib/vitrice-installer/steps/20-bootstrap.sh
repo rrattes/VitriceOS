@@ -36,9 +36,11 @@ usermod -U root || true
 usermod -U '${VITRICE_USERNAME}' || true
 sed -i 's/^# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /etc/sudoers
 
-# ── Limine bootloader (abordagem exata do Omarchy) ──────────────────────────
+# ── Limine bootloader ────────────────────────────────────────────────────────
 #
 # /etc/default/limine — mesmo formato que o Omarchy usa em default/limine/default.conf
+# Nota: ENABLE_UKI removido — requer limine-mkinitcpio-hook (repo custom Omarchy,
+# não disponível nos mirrors padrão do Arch). Usamos boot Linux padrão.
 cat > /etc/default/limine <<LIMINE_DEFAULT
 TARGET_OS_NAME="VitriceOS"
 
@@ -46,21 +48,21 @@ ESP_PATH="/boot"
 
 KERNEL_CMDLINE[default]="root=UUID=${ROOT_UUID} rw quiet"
 
-ENABLE_UKI=yes
-CUSTOM_UKI_NAME="vitriceos"
-
 ENABLE_LIMINE_FALLBACK=yes
 
 FIND_BOOTLOADERS=yes
 
-BOOT_ORDER="*, *fallback"
+BOOT_ORDER="*, *fallback, Snapshots"
 
 MAX_SNAPSHOT_ENTRIES=5
+
+SNAPSHOT_FORMAT_CHOICE=5
 LIMINE_DEFAULT
 
-# /boot/limine.conf — mesmo formato que o Omarchy usa em default/limine/limine.conf
+# /boot/limine.conf — mesmo formato visual do Omarchy (default/limine/limine.conf)
+# + entradas de boot explícitas (sem limine-update, que não existe nos repos padrão)
 cat > /boot/limine.conf <<LIMINE_CONF
-### Leia mais em: https://github.com/limine-bootloader/limine/blob/trunk/CONFIG.md
+### VitriceOS Bootloader — https://github.com/limine-bootloader/limine/blob/trunk/CONFIG.md
 default_entry: 1
 interface_branding: VitriceOS
 interface_branding_color: 2
@@ -76,16 +78,26 @@ term_palette_bright: 414868;f7768e;9ece6a;e0af68;7aa2f7;bb9af7;7dcfff;c0caf5
 term_foreground: c0caf5
 term_foreground_bright: c0caf5
 term_background_bright: 24283b
+
+/VitriceOS
+    protocol: linux
+    path: boot():/vmlinuz-linux
+    cmdline: root=UUID=${ROOT_UUID} rw quiet
+    module_path: boot():/initramfs-linux.img
+    module_path: boot():/initramfs-linux-fallback.img
+
+/VitriceOS (recuperação)
+    protocol: linux
+    path: boot():/vmlinuz-linux
+    cmdline: root=UUID=${ROOT_UUID} rw
+    module_path: boot():/initramfs-linux-fallback.img
 LIMINE_CONF
 
-# Instalação UEFI: copiar binário EFI para o caminho de fallback (sem precisar de efivars)
+# EFI: copia binário para caminho fallback padrão (sem precisar de efivars)
 if [[ -d /sys/firmware/efi ]]; then
   mkdir -p /boot/EFI/BOOT
   cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/BOOTX64.EFI
 fi
-
-# limine-update — exatamente o mesmo comando que o Omarchy usa (limine-snapper.sh)
-limine-update
 
 rm -f /root/vitrice-post-chroot.sh
 CHROOT
@@ -93,7 +105,9 @@ CHROOT
 run "chmod +x '${VITRICE_TARGET}/root/vitrice-post-chroot.sh'"
 run "arch-chroot '${VITRICE_TARGET}' /root/vitrice-post-chroot.sh"
 
-# Instalação BIOS (MBR) — feita fora do chroot, exige acesso direto ao disco
+# Instalação BIOS (MBR) — feita fora do chroot, exige acesso direto ao disco.
+# limine-bios.sys é o stage 2 lido pelo MBR após POST; deve estar no ESP.
 if [[ ! -d /sys/firmware/efi ]]; then
+  run "cp /usr/share/limine/limine-bios.sys '${VITRICE_TARGET}/boot/'"
   run "limine bios-install '${VITRICE_DISK}'"
 fi
