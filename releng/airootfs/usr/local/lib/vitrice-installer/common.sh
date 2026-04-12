@@ -19,7 +19,7 @@ run() {
   if [[ "${VITRICE_DRY_RUN}" == "1" ]]; then
     printf '[dry-run] %s\n' "$*"
   else
-    eval "$*"
+    bash -c "$*"
   fi
 }
 
